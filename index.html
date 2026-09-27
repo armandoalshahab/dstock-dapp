@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>dStock — Hold $DSTOCK. Earn stocks.</title>
+<meta name="description" content="dStock distributes tokenized RWA stocks to eligible $DSTOCK holders on Robinhood Chain testnet." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">d<span>S</span></span>
+    <span class="brand-name">dSTOCK</span>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-view="swap">SWAP</button>
+    <button class="tab" data-view="portfolio">PORTFOLIO</button>
+    <button class="tab" data-view="distribution">DISTRIBUTIONS</button>
+    <button class="tab" data-view="rwa">RWA</button>
+  </nav>
+  <div class="top-right">
+    <span class="chain-pill" id="chainPill">ROBINHOOD TESTNET · 46630</span>
+    <button class="btn btn-connect" id="connectBtn">CONNECT</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="hero">
+    <p class="hero-kicker">// DAO STOCKS · ROBINHOOD CHAIN TESTNET</p>
+    <h1>Hold the stock index.<br/><span>Earn it.</span></h1>
+    <p class="hero-sub">Eligible <b>$DSTOCK</b> holders receive pro-rata distributions of tokenized RWA equities — AAPL, NVDA, TSLA and more — funded by protocol fees.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary" data-jump="swap">BUY $DSTOCK →</button>
+      <button class="btn btn-ghost" data-jump="distribution">HOW IT WORKS</button>
+    </div>
+    <div class="hero-stats" id="heroStats"><!-- js --></div>
+  </section>
+
+  <!-- ============ SWAP ============ -->
+  <section class="view" id="view-swap" hidden>
+    <div class="panel swap-panel">
+      <div class="panel-head"><h2>SWAP</h2><span class="hint">1.5% fee · fees fund the stock treasury</span></div>
+      <div class="swap-box">
+        <div class="swap-row">
+          <span class="row-label">YOU PAY</span>
+          <input id="amtIn" type="number" inputmode="decimal" placeholder="0.0" />
+          <button class="token-chip" id="chipFrom">ETH ▾</button>
+        </div>
+        <div class="swap-arrow">↓</div>
+        <div class="swap-row">
+          <span class="row-label">YOU RECEIVE</span>
+          <input id="amtOut" type="number" placeholder="0.0" readonly />
+          <button class="token-chip" id="chipTo">DSTOCK ▾</button>
+        </div>
+        <div class="swap-quote" id="swapQuote">Connect wallet for a live quote.</div>
+        <div class="swap-router" id="swapRouterRow">
+          <span class="row-label">ROUTER</span>
+          <input id="routerIn" type="text" spellcheck="false" placeholder="pool/contract 0x… (NOT your wallet)" />
+          <button class="btn-mini" id="routerSave">SAVE</button>
+        </div>
+        <button class="btn btn-primary wide" id="swapBtn">CONNECT WALLET</button>
+        <p class="swap-note" id="swapNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PORTFOLIO ============ -->
+  <section class="view" id="view-portfolio" hidden>
+    <div class="panel">
+      <div class="panel-head"><h2>PORTFOLIO</h2><span class="hint">live from on-chain balance · Blockscout API</span></div>
+      <div class="grid-3" id="portfolioCards"><!-- js --></div>
+      <div class="eligibility" id="eligibilityCard"><!-- js --></div>
+    </div>
+  </section>
+
+  <!-- ============ DISTRIBUTION ============ -->
+  <section class="view" id="view-distribution" hidden>
+    <div class="panel">
+      <div class="panel-head"><h2>DISTRIBUTIONS</h2><span class="hint">treasury buys equities with collected fees, then streams them pro-rata</span></div>
+      <div class="dist-mech">
+        <div class="mech-step"><b>1</b><span>Trade fee <em id="feePct"></em> accrues to treasury in ETH</span></div>
+        <div class="mech-step"><b>2</b><span>Treasury buys supported stocks in equal parts</span></div>
+        <div class="mech-step"><b>3</b><span>Wallets above <em id="minHold"></em> claim pro-rata each epoch</span></div>
+      </div>
+      <div class="countdown-row">
+        <span class="lbl">NEXT DISTRIBUTION</span>
+        <span class="countdown" id="countdown">00:00:00</span>
+      </div>
+      <div class="feed" id="distFeed"><!-- js --></div>
+    </div>
+  </section>
+
+  <!-- ============ RWA ============ -->
+  <section class="view" id="view-rwa" hidden>
+    <div class="panel">
+      <div class="panel-head"><h2>SUPPORTED RWA</h2><span class="hint">tokenized equities in the dStock basket</span></div>
+      <div class="stock-grid" id="stockGrid"><!-- js --></div>
+      <div class="rwa-disclaimer">Prices shown are indicative testnet oracle values. Nothing here is investment advice; $DSTOCK and all testnet assets have no monetary value.</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-left">dSTOCK · BUILDER PROJECT ON <a href="https://testnet.vibevibe.fun/" target="_blank" rel="noopener">VIBE/VIBE TESTNET</a></div>
+  <div class="foot-right">
+    <a href="#" id="caLink">CONTRACT: <span class="mono" id="caText"></span></a>
+  </div>
+</footer>
+
+<!-- ============ wallet connect modal ============ -->
+<div class="modal-bg" id="walletModal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h3>CONNECT WALLET</h3>
+      <button class="modal-x" id="walletClose" aria-label="close">✕</button>
+    </div>
+    <p class="modal-sub">Choose from an installed wallet or a supported option below.</p>
+    <div class="wallet-list" id="walletList"><!-- js --></div>
+    <div class="wallet-sep">OR CONTINUE WITH</div>
+    <div class="wallet-social" id="walletSocial"><!-- js --></div>
+    <p class="modal-foot">By connecting you accept the <a href="https://testnet.vibevibe.fun/" target="_blank" rel="noopener">testnet user agreement</a>. Nothing here has monetary value.</p>
+  </div>
+</div>
+
+<!-- ============ support widget ============ -->
+<div class="support-fab" id="supportFab" title="Contact support">
+  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+</div>
+<div class="support-pop" id="supportPop" hidden>
+  <div class="sp-head">dSTOCK SUPPORT</div>
+  <div class="sp-body">Questions about $DSTOCK, eligibility, or distributions?</div>
+  <div class="sp-links" id="spLinks"><!-- js --></div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
